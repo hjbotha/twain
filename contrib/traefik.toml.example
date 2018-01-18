@@ -1,0 +1,5 @@
+[entryPoints.https]
+	address = ":443"
+	[entryPoints.https.tls]
+		[entryPoints.https.auth.forward]
+			address = "http://twain.internal.address:port/traefik.php"

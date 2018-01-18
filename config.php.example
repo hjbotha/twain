@@ -1,0 +1,33 @@
+<?php
+
+// Configure these options
+
+// Where the sqlite database will be stored.
+$db = new PDO("sqlite:../data/auth.db");
+
+/*
+The sqlite database contains the following:
+- Users
+- URLs which users don't need to log in to access
+- IPs from which users can access apps without logging in
+- Tokens, which are linked to users
+*/
+
+// Mail server details used to send authentication mails
+$mailserver = 'mailserver.domain.tld';
+$mailuser = 'user@domain.tld';
+$mailpass = 'password';
+
+// Your domain. This will be used to set authentication cookies, so it's mandatory.
+$domain = "domain.tld";
+
+// Title of the login and other pages
+$title = 'Mosli';
+
+// Where you want users to end up if they didn't get redirected here.
+$default_site = "https://portal.domain.tld";
+
+// The subdomain of this app. Used to avoid blocking access to twain.
+$auth_server_url = "https://twain.domain.tld";
+
+?>
