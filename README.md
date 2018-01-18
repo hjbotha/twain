@@ -12,7 +12,7 @@ What it does:
 
 ## How to deploy
 Clone the project  
-Edit the config.php file
+Copy config.php.example to config.php and edit it  
 Make sure the following modules are enabled in your web server  
 - php7
 - php7-sqlite
