@@ -1,5 +1,4 @@
 
-data/auth.db
 config.php
 www/styles.css
 www/nginx.php
