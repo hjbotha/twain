@@ -19,14 +19,6 @@ if ($user != '') {
 			setcookie('user', $user,        time()+60*60*24*365, '/', "." . $domain);
 			echo "<H2>Redirecting</H2><p>Attempting to redirect you to " . $source . "</p>";
 			exit;
-		} else {
-			header("HTTP/1.1 401 Unauthorized");
-			send_head($title);
-			echo "<h2>Wrong username/password</h2><p>Please try again.</p>";
-			send_form($source);
-			send_tail();
-			exit;
-
 		}
 	} else {
 		$auth_token = getGUID();
@@ -43,7 +35,12 @@ if ($user != '') {
 
 header("HTTP/1.1 401 Unauthorized");
 send_head($title);
-send_form_head();
+if (($user != '') || ($pass != '')) {
+	echo "<h2>Wrong username/password</h2><p>Please try again.</p>";
+} else {
+	send_form_head();
+
+}
 send_form($source);
 send_tail();
 exit;
