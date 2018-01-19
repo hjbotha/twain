@@ -3,8 +3,6 @@ $time_execution = false;
 
 $start = microtime(true);
 
-#echo $start;
-
 include '../config.php';
 include '../include/functions.php';
 include '../include/html.php';
@@ -58,9 +56,6 @@ if (check_token_valid($db, $token,$cookie_user)) {
 
 header("HTTP/1.1 401 Unauthorized");
 send_head($title);
-// print_r($_SERVER);
-// echo $basic_user;
-// echo $basic_pass;
 send_form($source);
 send_tail();
 exit;
