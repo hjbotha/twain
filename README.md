@@ -9,7 +9,7 @@ What it does:
 	- URL
 	- Client IP address
 	- Basic authentication
-- Allow access with an emailed magic link
+- Allow access with an emailed magic link (log in by email)
 
 ### How to deploy
 Clone the project  
@@ -30,5 +30,5 @@ Current versions of Traefik will not pass paths to the auth server. To be able t
 I'm not an experienced PHP developer by any means, so please feel free to submit PRs to improve things.  
 
 ### Usage:
-To log in: Attempt to visit one of your subdomains. You should be asked to log in.
+To log in: Attempt to visit one of your subdomains. Enter your username and password or just enter your username to authenticate by emailed magic link
 To log out: Go to https://\<subdomain of twain>\/logout.php
