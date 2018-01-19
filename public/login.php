@@ -22,7 +22,7 @@ if ($user != '') {
 		} else {
 			header("HTTP/1.1 401 Unauthorized");
 			send_head($title);
-			echo "<p>Wrong username/password. Please try again.</p>";
+			echo "<h2>Wrong username/password</h2><p>Please try again.</p>";
 			send_form($source);
 			send_tail();
 			exit;
@@ -35,7 +35,7 @@ if ($user != '') {
 		$authurl = "https://auth.home.mosli.net/auth.php?user=$user&token=$auth_token&secret=$secret&source=$source";
 		send_auth_email($user,$ip,$authurl);
 		send_head($title);
-		echo "<h2>Email sent</h2><p>Click the link in the email to finish logging in.";
+		echo "<h2>Email sent</h2><p>If you have a valid account you will receive an email.<br>Click the link in the email to finish logging in.";
 		send_tail();
 		exit;
 	}
@@ -43,6 +43,7 @@ if ($user != '') {
 
 header("HTTP/1.1 401 Unauthorized");
 send_head($title);
+send_form_head();
 send_form($source);
 send_tail();
 exit;

@@ -13,9 +13,11 @@ function send_head($title) {
 ';
 }
 
+function send_form_head() {
+	echo '<h2>Log in to Mosli</h2>';
+}
 function send_form($source,$post_target = "https://auth.home.mosli.net/login.php",$message = 'form') {
 	echo '
-	<h2>Log in to Mosli</h2>
 	<form method="post" action="'.$post_target.'">
 		<p><input type="text" name="username" placeholder="username" /></p>
 		<p><input type="password" name="password" placeholder="password" /></p>
