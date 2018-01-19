@@ -55,7 +55,9 @@ if (check_token_valid($db, $token,$cookie_user)) {
 
 
 header("HTTP/1.1 401 Unauthorized");
-send_head($title);
+send_start_to_meta();
+send_head();
+send_title_to_div($title);
 send_form_head();
 send_form($source);
 send_tail();

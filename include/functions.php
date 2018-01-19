@@ -89,7 +89,7 @@ function get_source($preferred_source) {
 	if ($preferred_source) {
 		return $preferred_source;
 	}
-	return $default_site;
+	return $GLOBALS['default_site'];
 }
 
 function cidr_match($ip, $range) {
