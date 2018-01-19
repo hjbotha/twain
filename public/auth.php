@@ -7,15 +7,11 @@ include '../include/html.php';
 $token = $_GET['token'];
 $provided_secret = $_GET['secret'];
 $user = $_GET['user'];
-$source = $_GET["source"];
 
 if (is_secret_correct($db,$token,$user,$provided_secret)) {
 	pdo_authorise_session_token($db,$token);
-	setcookie('token', $token, 0, '/', "." . $domain);
-	setcookie('user', $user, 0, '/', "." . $domain);
-	header('Location: ' . $source, true, 301);
 	send_head($title);
-	echo "<H1>Success! Attempting to redirect you to " . $source . "</H1>";
+	echo '<h2>Successfully authorised</h2>';
 	send_tail();
 	exit;
 }

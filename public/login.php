@@ -24,10 +24,14 @@ if ($user != '') {
 		$auth_token = getGUID();
 		$secret = generate_secret();
 		pdo_create_auth_token($db,$auth_token,$user,$secret);
-		$authurl = "https://auth.home.mosli.net/auth.php?user=$user&token=$auth_token&secret=$secret&source=$source";
+		$authurl = "https://auth.home.mosli.net/auth.php?user=$user&token=$auth_token&secret=$secret";
 		send_auth_email($user,$ip,$authurl);
 		send_head($title);
+<<<<<<< HEAD
 		echo "<h2>Email sent</h2><p>If you have a valid account you will receive an email.<br>Click the link in the email to finish logging in.";
+=======
+		echo "<h2>Email sent</h2><p>Click the link in the email to authorise this login and then click <a class=\"normal\" href=\"check.php?user=$user&token=$auth_token&source=$source\">here</a> to log in.</p>";
+>>>>>>> parent of 6cc8481... simplified email login flow
 		send_tail();
 		exit;
 	}
