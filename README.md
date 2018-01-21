@@ -4,7 +4,7 @@
 A php-based forward-authenticating app for a reverse proxy
 
 What it does:
-- For an overview of what this does, see http://blog.mosli.net/2018/01/using-twain-for-forward-authentication.html
+- For an overview of what this does, see [here](https://hjbotha.github.io/twain)
 - Allow access to sites based on
 	- URL
 	- Client IP address
