@@ -1,0 +1,19 @@
+auth_request /twainauth;
+
+error_page 401 = @error401;
+location @error401 {
+        return 302 https://twain.domain.tld/login.php?from=$scheme://$host$request_uri;
+}
+
+location /twainauth {
+        internal;
+        proxy_pass https://twain.domain.tld/nginx.php;
+        proxy_pass_request_body off;
+        proxy_set_header Content-Length "";
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Forwarded-For $remote_addr;
+        proxy_set_header X-Forwarded-Proto $scheme;
+#       proxy_set_header X-Checking-Auth 1;
+#       proxy_set_header X-Authorization $authorization;
+        proxy_set_header X-Forwarded-URI $request_uri;
+}

@@ -1,48 +1,66 @@
 <?php
+$time_execution = false;
 
-include 'include/config.php';
-include 'include/functions.php';
-include 'include/html.php';
+$start = microtime(true);
 
-$user = getValueFrom('username');
-$hashed_pass = getValueFrom('password');
+include '../config.php';
+include '../include/functions.php';
+include '../include/html.php';
+
+$basic_user = $_SERVER["PHP_AUTH_USER"];
+$basic_pass = $_SERVER["PHP_AUTH_PW"];
 $ip = $_SERVER["HTTP_X_FORWARDED_FOR"];
-$source =  get_source($_GET["from"]);
+$requrl = $_SERVER["HTTP_X_FORWARDED_PROTO"] . "://" . $_SERVER["HTTP_X_FORWARDED_HOST"] . $_SERVER["HTTP_X_FORWARDED_URI"];
+$source = get_source($_GET["from"]);
+$cookie_user = $_COOKIE['user'];
+$token = $_COOKIE['token'];
 
-$requrl = $_SERVER["HTTP_X_FORWARDED_PROTO"] . "://" . $_SERVER["HTTP_X_FORWARDED_HOST"] . "/" . $_SERVER["HTTP_X_REQUEST_URI"];
-foreach ($authed_urls as $cururl) {
-	if (strpos($cururl,$requrl)) {
+// Allow the request if it's for the auth site (defined in the config file)
+// or it matches an exact allowed URL (authed_urls table)
+// or starts with an allowed URL (authed_url_patterns table)
+if (is_authed_url($requrl)) {
+	exit;
+}
+
+// Allow the request if it comes from an IP address matching a network present in the authed_networks table
+// allow_if_request_from_authed_network($);
+
+// Allow if the request includes basic authentication credentials matching a user in the users table.
+// allow_if_basic_authentication($);
+
+// Allow if the request include a cookie with a valid user and token.
+// allow_if_valid_token($user,$token);
+
+$authed_subnets = pdo_select_all($db,'authorised_networks','address');
+if (isset($authed_subnets)) {
+	foreach ($authed_subnets as $address) {
+		if (cidr_match($ip,$address['address']) == true) {
+			return true; 
+		}
+	}
+}
+
+// handle basic authentication
+if ((isset($basic_user)) && (isset($basic_pass))) {
+	if (check_credentials($basic_user,$basic_pass)) {
+		printExecutionTime($start, $time_execution);
 		exit;
 	}
 }
 
-if (check_ip($ip,$authed_subnets)) {
+if (check_token_valid($db, $token,$cookie_user)) {
+    printExecutionTime($start, $time_execution);
 	exit;
 }
 
-if (in_array($_SERVER["HTTP_HOST"],$authed_backend_servers)) {
-	exit;
-}
-
-if (isset($_SERVER["Authorization"])) {
-	$http_auth_string = $explode(" ", $_SERVER["Authorization"])[1];
-	foreach ($authed_users as $user) {
-		if (base64_encode($user) == $http_auth_string) {
-			exit;
-		}
-	}
-}	
-
-if (check_credentials($user, $hashed_pass, $authed_users)) {
-	/* Set cookie to last 1 year */
-	setcookie('username', $user, time()+60*60*24*365, '/', '.home.mosli.net');
-	setcookie('password', $hashed_pass, time()+60*60*24*365, '/', '.home.mosli.net');
-	exit;
-}
 
 header("HTTP/1.1 401 Unauthorized");
-
-
-
+send_start_to_meta();
+send_head();
+send_title_to_div($title);
+send_form_head();
+send_form($source);
+send_tail();
+exit;
 
 ?>
