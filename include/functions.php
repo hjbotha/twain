@@ -36,7 +36,11 @@ function is_authed_url($requrl) {
 function get_user_property($user,$property) {
 	$result = pdo_select($GLOBALS['db'],'users',$property,'username',$user)[0][$property];
 	return is_null($result) ? null : $result;
+}
 
+function get_token_property($token,$property) {
+	$result = pdo_select($GLOBALS['db'],'tokens',$property,'token',$token)[0][$property];
+	return is_null($result) ? null : $result;
 }
 
 function send_auth_email($user,$sourceip,$authlink) {
@@ -52,7 +56,7 @@ function send_email($to, $subject, $body) {
 	$mailpass = $GLOBALS['mailpass'];
 	$mailfrom = $GLOBALS['mailfrom'];
 	$mailfromname = $GLOBALS['mailfromname'];
-	echo "your email has not been sent";
+	error_log("your email has not been sent");
 }
 
 function getGUID(){
@@ -167,8 +171,8 @@ function pdo_delete($db,$table,$searchcolumn,$searchvalue) {
 }
 
 function pdo_create_persistent_token($db,$token,$user) {
-	$expiry_date = time() + 60 * 60 * 24 * 365;
-	$stmt = $db->prepare("INSERT INTO tokens (token,expiry_date,authorised,user) VALUES (:token,$expiry_date,1,:user)");
+	$expiry_date = time() + 60 * 60 * 24 * 28;
+	$stmt = $db->prepare("INSERT INTO tokens (token,expiry_date,authorised,user,authmethod) VALUES (:token,$expiry_date,1,:user,'password')");
 	$stmt->bindparam(':token', $token);
 	$stmt->bindparam(':user', $user);
 	return $stmt->execute();
@@ -183,6 +187,19 @@ function pdo_create_auth_token($db,$token,$user,$secret) {
 	return $stmt->execute();
 }
 
+function get_token_authmethod($token) {
+	$result = get_token_property($token,'authmethod');
+	return is_null($result) ? null : $result;
+}
+
+function pdo_update_auth_token($db,$token) {
+	$expiry_date = time() + 60 * 10;
+	$stmt = $db->prepare("UPDATE tokens SET expiry_date = $expiry_date WHERE token = :token");
+	$stmt->bindparam(':token', $token);
+	return $stmt->execute();
+}
+
+
 function generate_secret() {
 	$characters = 'QWERTYUIOPLKJHGFDSAZXCVBNMabcdefghijklmnopqrstuvwxyz0123456789';
 	$secret = '';
@@ -196,7 +213,7 @@ function generate_secret() {
 
 function pdo_authorise_session_token($db,$token) {
 	$expiry_date = time() + 60 * 10;
-    $stmt = $db->prepare("UPDATE tokens SET authorised = 1, secret = '', expiry_date = $expiry_date WHERE token = :token");
+    $stmt = $db->prepare("UPDATE tokens SET authorised = 1, secret = '', expiry_date = $expiry_date, authmethod = 'mail' WHERE token = :token");
     $stmt->bindparam(':token', $token);
     return $stmt->execute();
 }
@@ -212,5 +229,14 @@ function pdo_retrieve_token($db, $token) {
 	$result = pdo_select($db,"tokens","secret,authorised,expiry_date,user","token",$token);
 	return $result;
 }
+
+function check_user($user) {
+	$status = get_user_property($user,'status');
+	if ($status === "true") {
+		return true;
+	}
+	return false;
+}
+
 
 ?>

@@ -8,7 +8,7 @@ $tables = ['users(username STRING, password STRING, plaintext BOOLEAN, email STR
             'dbversion (version INTEGER)',
             'authorised_url_patterns (url_pattern STRING)',
             'authorised_urls (url STRING)',
-			'tokens (token STRING, user STRING, authorised BOOLEAN, secret STRING, expiry_date DATETIME)',
+			'tokens (token STRING, user STRING, authorised BOOLEAN, secret STRING, expiry_date DATETIME, authmethod STRING, status BOOLEAN)',
 			'authorised_networks (address STRING)',];
 
 
@@ -25,8 +25,15 @@ foreach ($tables as $table) {
 }
 
 $current_version = pdo_select_all($db,'dbversion');
-if ($current_version[0]['version'] === '1') {
+
+if ($current_version[0]['version'] === '2') {
 	header("HTTP/1.1 404 Not Found");
+	exit;
+} elseif ($current_version[0]['version'] === '1') {
+	$db->query("ALTER TABLE tokens ADD authmethod STRING");
+	$db->query("ALTER TABLE tokens ADD status BOOLEAN");
+	$db->query("UPDATE dbversion SET version = 2");
+	echo "Successfully updated database to version 2.";
 	exit;
 }
 

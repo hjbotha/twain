@@ -49,6 +49,9 @@ if ((isset($basic_user)) && (isset($basic_pass))) {
 }
 
 if (check_token_valid($db, $token,$cookie_user)) {
+	if (get_token_authmethod($token) === "password") {
+		pdo_update_auth_token($db,$token);
+	}
     printExecutionTime($start, $time_execution);
 	exit;
 }

@@ -21,12 +21,15 @@ if ($user != '') {
 			exit;
 		}
 	} else {
-		$auth_token = getGUID();
-		$secret = generate_secret();
-		pdo_create_auth_token($db,$auth_token,$user,$secret);
-		$authurl = "https://auth.home.mosli.net/auth.php?user=$user&token=$auth_token&secret=$secret";
+		if (check_user($user)) {
+		error_log("checking user");
+			$auth_token = getGUID();
+			$secret = generate_secret();
+			pdo_create_auth_token($db,$auth_token,$user,$secret);
+			$authurl = "https://auth.home.mosli.net/auth.php?user=$user&token=$auth_token&secret=$secret";
+			error_log(send_auth_email($user,$ip,$authurl));
+		}
 		$checkurl = "$auth_server_url/check.php?token=$auth_token&user=$user";
-		send_auth_email($user,$ip,$authurl);
 		send_start_to_meta();
 		send_head();
 		send_js($source,$checkurl);
