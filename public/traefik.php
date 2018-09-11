@@ -28,6 +28,11 @@ if (isset($authed_subnets)) {
 	}
 }
 
+if (is_authed_url($requrl)) {
+	printExecutionTime($start, $time_execution);
+	exit;
+}
+
 $matching_uris = get_uris_from_db($requrl);
 if ($matching_uris) { 												// if the request is for an address in the uris table
 	foreach ($matching_uris as $matching_uri) { 					// for each matching uri
@@ -37,7 +42,8 @@ if ($matching_uris) { 												// if the request is for an address in the uri
 		}
 		$networks = explode(',',$matching_uri['networks']); 		// explode the comma-separate list of networks in that row into an array
 		foreach ($networks as $network) { 							// for each network
-			if (cidr_match($ip,$network) == true) { 				// if the client's IP matches
+			if (($network) && (cidr_match($ip,$network) == true)) { // if the client's IP matches
+				error_log($network);
 				printExecutionTime($start, $time_execution);
 				exit; 												// allow the request
 			}
@@ -47,7 +53,7 @@ if ($matching_uris) { 												// if the request is for an address in the uri
 				pdo_update_auth_token($db,$token);					// reset the expiry time of that token
 			}
 			$users = explode(',',$matching_uri['users']);			// explode the comma-separated list of users from the matching entry in the uris table
-			if ((in_array($cookie_user,$users)) || (in_array('*',$users))) { 
+			if ((in_array($cookie_user,$users)) || (in_array('*',$users))) {
 																	// if the requesting user is allowed to access the requested resource
 				printExecutionTime($start, $time_execution);
 				exit;												// allow the request

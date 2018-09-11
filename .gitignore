@@ -1,7 +1,4 @@
 
 config.php
-www/styles.css
-www/nginx.php
+public/styles.css
 *.db
-public/phpliteadmin.php
-phpliteadmin.config.php

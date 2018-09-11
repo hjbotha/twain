@@ -22,20 +22,6 @@ function get_uris_from_db(string $requrl) {
 }
 
 function is_authed_url($requrl) {
-	$db = $GLOBALS['db'];
-	$authed_url_patterns = pdo_select_all($db,'authorised_url_patterns','url_pattern');
-	foreach ($authed_url_patterns as $cururl) {
-		if (strpos($requrl,$cururl['url_pattern']) === 0) {
-			return true;
-		}
-	}
-	
-	$authed_exact_urls = pdo_select_all($db,'authorised_urls','url');
-	foreach ($authed_exact_urls as $cururl) {
-		if (strpos($requrl,$cururl['url']) === 0) {
-			return true;
-		}
-	}
 	if (strpos($requrl,$GLOBALS['auth_server_url']) === 0) {
 		return true;
 	}
