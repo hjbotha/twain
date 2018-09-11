@@ -36,7 +36,7 @@ if (is_authed_url($requrl)) {
 $matching_uris = get_uris_from_db($requrl);
 if ($matching_uris) { 												// if the request is for an address in the uris table
 	foreach ($matching_uris as $matching_uri) { 					// for each matching uri
-		if ($matching_uri['anonymous'] == TRUE) {					// if anonymous access is allowed to this uri
+		if ($matching_uri['anonymous'] == true) {					// if anonymous access is allowed to this uri
 			printExecutionTime($start, $time_execution);
 			exit;													// allow the request
 		}
@@ -70,8 +70,12 @@ header("HTTP/1.1 401 Unauthorized");
 send_start_to_meta();
 send_head();
 send_title_to_div($title);
-send_form_head();
-send_form($source);
+if (check_token_valid($db, $token,$cookie_user)) {			// if the requesting user has a valid token
+	echo "<h2>Not an allowed site.</h2><p>You are logged in, but that site is not externally accessible.</p>";
+} else {
+	send_form_head();
+	send_form($source);
+}
 send_tail();
 exit;
 

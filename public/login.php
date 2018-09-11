@@ -4,7 +4,7 @@ include '../config.php';
 include '../include/functions.php';
 include '../include/html.php';
 
-$user = $_POST['username'];
+$user = strtolower($_POST['username']);
 $pass = $_POST['password'];
 $source = get_source($_POST["source"]);
 $ip = $_SERVER["HTTP_X_FORWARDED_FOR"];
