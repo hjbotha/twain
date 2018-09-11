@@ -25,7 +25,7 @@ Configure traefik to send requests for the subdomain twain is running on to twai
 Configure traefik* to use the published site as the forward authentication server  
 Create a styles.css file in public and tweak the form in include/html.php to your heart's content. Some really pretty logon forms are just a search away.
 
-Current versions of Traefik will not pass paths to the auth server. To be able to evaluate paths, Traefik must be compiled from master.
+Older versions of Traefik will not pass paths to the auth server. To be able to evaluate paths, Traefik must be at least version 1.6.
 
 I'm not an experienced PHP developer by any means, so please feel free to submit PRs to improve things.  
 

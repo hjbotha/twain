@@ -1,6 +1,4 @@
 <?php
-$time_execution = false;
-
 $start = microtime(true);
 
 include '../config.php';

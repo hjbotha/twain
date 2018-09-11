@@ -1,5 +1,9 @@
 <?php
 
+function delete_expired_tokens($db) {
+	pdo_delete2($db,'tokens','expiry_date','<', time());
+}
+
 function delete_old_files($path,$age) {
 	$files = glob($path . "/*");
 	$now = time();
@@ -10,6 +14,11 @@ function delete_old_files($path,$age) {
 			}
 		}
 	}
+}
+
+function get_uris_from_db(string $requrl) {
+	$db = $GLOBALS['db'];
+	return pdo_select_reverse($db,'uris','*',$requrl,'LIKE','uri');
 }
 
 function is_authed_url($requrl) {
@@ -85,7 +94,7 @@ function send_html($head,$form,$tail) {
 function printExecutionTime($start,$time_execution = false) {
 	if ($time_execution == true) {
 		$execution_time = microtime(true) - $start;
-		echo "Execution time: " . $execution_time;
+		error_log("Execution time: " . $execution_time . " s");
 	}
 }
 
@@ -132,14 +141,29 @@ function is_secret_correct($db,$token,$user,$provided_secret) {
 	return false;
 }
 
-function pdo_select($db,$table,$returncolumns,$searchcolumn,$searchvalue) {
-	$test = $db->prepare("SELECT COUNT(*) FROM $table WHERE $searchcolumn=:searchvalue");
-	$test->bindparam(':searchvalue', $searchvalue);
+function pdo_select_reverse($db,$table,$returncolumns,$searchstring,$operator,$searchcolumn) {
+	$test = $db->prepare("SELECT COUNT(*) FROM $table WHERE :searchstring " . $operator . " " . $searchcolumn);
+	$test->bindparam(':searchstring', $searchstring);
 	$test->execute();
 	$count = $test->fetchColumn();
 	if ($count > 0) {
-		$stmt = $db->prepare("SELECT $returncolumns FROM $table WHERE $searchcolumn" . "=" . ":searchvalue");
-		$stmt->bindparam(':searchvalue', $searchvalue);
+		$stmt = $db->prepare("SELECT $returncolumns FROM $table WHERE :searchstring " . $operator . " " . $searchcolumn);
+    	$stmt->bindparam(':searchstring', $searchstring);
+		$stmt->execute();
+		$result = $stmt->fetchAll();
+		return $result;
+	}
+	return null;
+}
+
+function pdo_select($db,$table,$returncolumns,$searchlocation,$searchtarget) {
+	$test = $db->prepare("SELECT COUNT(*) FROM $table WHERE $searchlocation=:searchtarget");
+	$test->bindparam(':searchtarget', $searchtarget);
+	$test->execute();
+	$count = $test->fetchColumn();
+	if ($count > 0) {
+		$stmt = $db->prepare("SELECT $returncolumns FROM $table WHERE $searchlocation" . "=" . ":searchtarget");
+		$stmt->bindparam(':searchtarget', $searchtarget);
 		$stmt->execute();
 		$result = $stmt->fetchAll();
 		return $result;
@@ -163,12 +187,20 @@ function pdo_delete_token($db,$token) {
 	return pdo_delete($db,'tokens','token',$token);
 }
 
-function pdo_delete($db,$table,$searchcolumn,$searchvalue) {
-    $stmt = $db->prepare("DELETE FROM $table WHERE $searchcolumn=:searchvalue");
-    $stmt->bindparam(':searchvalue', $searchvalue);
+function pdo_delete($db,$table,$searchlocation,$searchtarget) {
+    $stmt = $db->prepare("DELETE FROM $table WHERE $searchlocation=:searchtarget");
+    $stmt->bindparam(':searchtarget', $searchtarget);
     $stmt->execute();
-    return $stmt->fetchAll();
+	return $stmt->fetchAll();
 }
+
+function pdo_delete2($db,$table,$searchlocation,$searchoperator,$searchtarget) {
+    $stmt = $db->prepare("DELETE FROM $table WHERE $searchlocation $searchoperator :searchtarget");
+    $stmt->bindparam(':searchtarget', $searchtarget);
+    $stmt->execute();
+	return $stmt->fetchAll();
+}
+
 
 function pdo_create_persistent_token($db,$token,$user) {
 	$expiry_date = time() + 60 * 60 * 24 * 28;
